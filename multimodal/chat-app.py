@@ -70,7 +70,22 @@ def main():
                     print("Getting a response to your prompt...")
 
                     # Get a response to image input
+                    image_url = "https://github.com/microsoftlearning/mslearn-ai-studio/raw/refs/heads/main/labfiles/multimodal/orange.jpg"
+                    image_format = "jpeg"
+                    request = Request(image_url, headers={"User-Agent": "Mozilla/5.0"})
+                    image_data = base64.b64encode(urlopen(request).read()).decode("utf-8")
+                    data_url = f"data:image/{image_format};base64,{image_data}"
 
+                    response = chat_client.complete(
+                    messages=[
+                        SystemMessage(system_message),
+                        UserMessage(content=[
+                            TextContentItem(text=prompt),
+                            ImageContentItem(image_url=ImageUrl(url=data_url))
+                        ]),
+                    ]
+                    )
+                    print(response.choices[0].message.content)
 
             elif input_text == "3":
                 prompt = input("Enter the prompt to accompany an audio recording of 'Me gustaría comprar 2 manzanas.': ")
@@ -80,7 +95,23 @@ def main():
                     print("Getting a response to your prompt...")
 
                     # Get a response to audio input
-                    
+                    # Get a response to audio input
+                    file_path="https://github.com/microsoftlearning/mslearn-ai-studio/raw/refs/heads/main/labfiles/multimodal/manzanas.mp3"
+                    response = chat_client.complete(
+                        messages=[
+                            SystemMessage(system_message),
+                            UserMessage(
+                                [
+                                    TextContentItem(text=prompt),
+                                    {
+                                        "type": "audio_url",
+                                        "audio_url": {"url": file_path}
+                                    }
+                                ]
+                            )
+                        ]
+                    )
+                    print(response.choices[0].message.content)
 
             else:
                 print("Please enter a valid value")
